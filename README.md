@@ -1,258 +1,263 @@
-\# JobHunterAI
-
-
+# JobHunterAI 🤖
 
 An intelligent AI agent that automates job searching, analyzes job fit, and tracks applications using LangChain and GPT-4.
 
+## 🎯 What It Does
 
+- **Automated Job Search**: Searches multiple job boards (currently Adzuna API)
+- **AI-Powered Analysis**: Uses GPT-4 to analyze how well each job matches your profile
+- **Intelligent Scoring**: Ranks jobs 0-100 based on fit criteria
+- **Salary Intelligence**: Estimates compensation when not listed (with cited sources)
+- **Application Tracking**: SQLite database to track jobs and applications
+- **Detailed Reports**: Shows pros, cons, and specific reasoning for each recommendation
 
-\## Features
+## 🚀 Features
 
+- 🔍 Real job data from Adzuna API (no web scraping)
+- 🤖 GPT-4 powered job analysis with detailed reasoning
+- 💾 Local database for application tracking
+- 📊 Prioritized job lists (High/Medium/Low priority)
+- 💰 Salary estimation with cited sources when not provided
+- 🎯 Customizable candidate profile and search criteria
+- 📍 Location-based search (NYC, SF, Austin, Remote, etc.)
 
+## 📋 Prerequisites
 
-\- 🔍 Automated job search across multiple platforms
+- Python 3.11+
+- OpenAI API key
+- Adzuna API credentials (free tier available)
 
-\- 🤖 AI-powered job fit analysis
+## 🛠️ Installation
 
-\- 💾 Application tracking database
-
-\- 📧 Daily job digest emails
-
-\- ✍️ AI-generated cover letters (coming soon)
-
-
-
-\## Setup
-
-
-
-\### Prerequisites
-
-
-
-\- Python 3.11+
-
-\- OpenAI API key
-
-
-
-\### Installation
-
-
-
-1\. Clone the repository:
-
+### 1. Clone the Repository
 ```bash
-
-git clone https://github.com/yourusername/jobhunterai.git
-
+git clone https://github.com/jsolisdtw/jobhunterai.git
 cd jobhunterai
-
 ```
 
-
-
-2\. Create virtual environment:
-
+### 2. Set Up Virtual Environment
 ```bash
-
+# Windows
 py -m venv env
+.\env\Scripts\Activate.ps1
 
-.\\env\\Scripts\\Activate.ps1  # Windows
-
-\# or
-
-source env/bin/activate  # Mac/Linux
-
+# Mac/Linux
+python3 -m venv env
+source env/bin/activate
 ```
 
-
-
-3\. Install dependencies:
-
+### 3. Install Dependencies
 ```bash
-
 pip install -r requirements.txt
-
-playwright install chromium
-
 ```
 
+### 4. Configure API Keys
 
-
-4\. Configure environment variables:
-
+Copy the example environment file:
 ```bash
+# Windows
+copy .env.example .env
 
-\# Copy example config
-
-copy .env.example .env  # Windows
-
-\# or
-
-cp .env.example .env  # Mac/Linux
-
-
-
-\# Edit .env and add your OpenAI API key
-
-notepad .env
-
+# Mac/Linux
+cp .env.example .env
 ```
 
+Edit `.env` and add your API keys:
+```
+OPENAI_API_KEY=sk-your-openai-key-here
+ADZUNA_APP_ID=your-adzuna-app-id
+ADZUNA_API_KEY=your-adzuna-api-key
+```
 
+**Get API Keys:**
+- **OpenAI**: https://platform.openai.com/api-keys
+- **Adzuna**: https://developer.adzuna.com/signup (free tier: 1000 calls/month)
 
-5\. Run the agent:
+### 5. Customize Your Profile
 
+Edit `src/tools.py` and update the `my_profile` section in the `analyze_job_fit()` function with your:
+- Background and experience
+- Technical skills
+- Job search criteria (location, salary, schedule)
+- What you consider positive/negative signals
+
+## 🎮 Usage
+
+### Basic Job Search
 ```bash
-
 py src/agent.py
-
 ```
 
+This runs a search for Technical Program Manager roles in New York, NY (default).
 
+### Customize Search
 
-\## Configuration
-
-
-
-Create a `.env` file with:
-
-\- `OPENAI\_API\_KEY`: Your OpenAI API key (\[get one here](https://platform.openai.com/api-keys))
-
-\- `EMAIL\_FROM`: Your email for notifications (optional)
-
-\- `EMAIL\_TO`: Recipient email (optional)
-
-
-
-\*\*⚠️ Never commit `.env` to version control!\*\*
-
-
-
-\## Project Structure
-
-```
-
-jobhunterai/
-
-├── src/
-
-│   ├── agent.py       # Main AI agent
-
-│   ├── tools.py       # Agent tools (search, analyze, save)
-
-│   └── scrapers.py    # Job board scrapers
-
-├── data/              # SQLite database
-
-├── logs/              # Application logs
-
-├── .env.example       # Example configuration
-
-├── .gitignore         # Git ignore rules
-
-└── README.md          # This file
-
-```
-
-
-
-\## Usage
-
+Edit `src/agent.py` at the bottom:
 ```python
-
-\# Run daily job search
-
-py src/agent.py
-
-
-
-\# The agent will:
-
-\# 1. Search job boards for Senior TPM remote roles
-
-\# 2. Analyze each job for fit
-
-\# 3. Save promising jobs to database
-
-\# 4. Send email digest (if configured)
-
+jobs = agent.run(
+    query="Senior Software Engineer",  # Change job title
+    location="San Francisco, CA"        # Change location
+)
 ```
 
+### Example Output
+```
+🤖 JobHunterAI Agent Initialized
+======================================================================
 
+🎯 Searching for: 'Technical Program Manager' in New York, NY
+📊 Total available in New York, NY: 847
 
-\## Technology Stack
+🤔 Analyzing 10 jobs with AI...
+======================================================================
 
+[1/10] Senior Technical Program Manager at Google
+       Location: New York, NY
+       Salary: ✅ $180,000 - $250,000
+       ➜ Score: 85/100
+       ➜ Apply: Yes
+       ➜ Why: Strong technical match, excellent location, competitive salary...
 
+======================================================================
+                      JOB SEARCH RESULTS
+======================================================================
 
-\- \*\*LangChain\*\*: Agent framework
+📊 Summary:
+   • Total jobs analyzed: 10
+   • 🎯 High priority (80+): 3
+   • 📝 Medium priority (60-79): 4
+   • ⚠️  Lower priority (<60): 3
 
-\- \*\*OpenAI GPT-4\*\*: AI reasoning
+======================================================================
+🎯 HIGH PRIORITY - APPLY ASAP
+======================================================================
 
-\- \*\*BeautifulSoup\*\*: Web scraping
+1. Senior Technical Program Manager at Google
+   Company: Google
+   Location: New York, NY
+   Salary: ✅ $180,000-$250,000
+   Match Score: 85/100
+   Should Apply: Yes
+   Why: Strong technical match, excellent NYC location, salary meets criteria...
+   ✅ Pros: Top-tier company, strong engineering culture, clear technical focus
+   ⚠️  Cons: Competitive hiring process, may require more than 3 days in office
+   🔗 URL: https://...
+```
 
-\- \*\*SQLite\*\*: Local database
+## 📁 Project Structure
+```
+jobhunterai/
+├── src/
+│   ├── agent.py       # Main AI agent logic
+│   ├── tools.py       # Job search and analysis tools
+│   └── __init__.py
+├── data/              # SQLite database (auto-created)
+├── .env.example       # Example configuration
+├── .env               # Your API keys (gitignored)
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
 
-\- \*\*Playwright\*\*: Browser automation
+## 🔒 Security
 
+- **Never commit `.env`** - Your API keys are in `.gitignore`
+- **API keys are private** - The `.env.example` shows format only
+- **Database is local** - Your job search data stays on your machine
 
+## 🧠 How It Works
 
-\## Roadmap
+1. **Search**: Queries Adzuna API for jobs matching your criteria
+2. **Analyze**: For each job, GPT-4 analyzes:
+   - How well it matches your background
+   - Salary competitiveness (estimates if not listed, with sources)
+   - Location/commute implications
+   - Pros and cons specific to you
+3. **Score**: Ranks each job 0-100 based on fit
+4. **Prioritize**: Groups into High/Medium/Low priority
+5. **Save**: Stores high-priority jobs in local database
+6. **Report**: Generates detailed summary with recommendations
 
+## 🎯 Customization
 
+### Change Job Search Criteria
 
-\- \[x] Basic job search automation
+Edit `src/agent.py` - `main()` function:
+```python
+jobs = agent.run(
+    query="Your Job Title",
+    location="Your City, State"
+)
+```
 
-\- \[x] AI-powered job analysis
+### Adjust Candidate Profile
 
-\- \[x] Application tracking
+Edit `src/tools.py` - `analyze_job_fit()` function:
+- Update `my_profile` with your background
+- Modify positive/negative signals
+- Adjust salary expectations
 
-\- \[ ] AI-generated cover letters
+### Add More Job Sources
 
-\- \[ ] Resume tailoring suggestions
+The architecture supports multiple job sources. Currently implemented:
+- ✅ Adzuna API
 
-\- \[ ] Interview question generator
+Coming soon:
+- 📋 LinkedIn (via API)
+- 📋 RemoteOK
+- 📋 Built In
 
-\- \[ ] Web dashboard
+## 💡 Use Cases
 
-\- \[ ] Multi-user support
+- **Active Job Seekers**: Automate daily job searches
+- **Passive Candidates**: Monitor market for dream roles
+- **Career Research**: Understand salary trends and requirements
+- **Learning Project**: Study agentic AI and LangChain
 
+## 🛣️ Roadmap
 
+- [x] Basic job search automation
+- [x] AI-powered job analysis
+- [x] Salary estimation with citations
+- [x] Application tracking database
+- [ ] Multiple job board support
+- [ ] AI-generated cover letters
+- [ ] Resume tailoring suggestions
+- [ ] Email notifications for high-priority jobs
+- [ ] Web dashboard UI
+- [ ] Interview prep suggestions
 
-\## Security Notes
+## 🤝 Contributing
 
+This is a learning project and contributions are welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+- Share your customizations
 
+## 📝 License
 
-\- API keys are stored in `.env` (gitignored)
+MIT License - See LICENSE file
 
-\- Never commit sensitive credentials
+## 👨‍💻 Author
 
-\- Use environment variables for all secrets
+**Jose Solis** - Senior Technical Program Manager exploring agentic AI
 
-\- `.env.example` provided as template
+Built for fun!:
+- LangChain agent frameworks
+- OpenAI API integration
+- Job market APIs
+- AI prompt engineering
 
+## 🙏 Acknowledgments
 
-
-\## License
-
-
-
-MIT
-
-
-
-\## Author
-
-
-
-Jose - Senior Technical Program Manager building AI tools for job seekers
-
-
+- LangChain for the agent framework
+- OpenAI for GPT-4
+- Adzuna for job data API
+- The job search struggle that inspired this project
 
 ---
 
+**Note**: This is an educational project. Estimated cost: ~$1-2 per day of active use with OpenAI API.
 
-
-\*\*Note:\*\* This project uses paid OpenAI API. Estimated cost: ~$0.50-2.00 per day of active use.
-
+**Found this useful?** Give it a ⭐ on GitHub!
